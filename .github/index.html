@@ -41,6 +41,7 @@
 		</p>
 		<p>
 			You can use prebuilt versions of this port by adding <code>"__CRX3_ID__;https://__PAGES_URL__/update.xml"</code> to your <code>ExtensionInstallForcelist</code> policy.
+			<b>On Windows and macOS, you will need to trick Chrome into thinking your device is enterprise-managed to use ExtensionInstallForcelist. This may be undesirable.</b>
 			<ul>
 				<li>
 					Linux:
@@ -52,6 +53,7 @@
 				<li>
 					Windows:
 					<ol>
+						<li>Fake enterprise management for your device.</li>
 						<li>Open regedit, create the key <code>Software\Policies\Google\Chrome\ExtensionInstallForcelist</code>.</li>
 						<li>Add a string value named <code>1</code> (if it already exists choose the next available number).</li>
 						<li>Set it to <code>__CRX3_ID__;https://__PAGES_URL__/update.xml</code></li>
