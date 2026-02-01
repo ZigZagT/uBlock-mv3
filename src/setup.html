@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="color-scheme" content="light dark" />
+<title>uBlock Origin - Setup Required</title>
+<link rel="stylesheet" href="css/themes/default.css">
+<link rel="stylesheet" href="css/common.css">
+<link rel="icon" type="image/png" href="img/icon_64.png">
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    line-height: 1.6;
+}
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.header img {
+    width: 48px;
+    height: 48px;
+}
+.header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+.status-card {
+    background: var(--surface-1, #f5f5f5);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-1, #e0e0e0);
+}
+.status-item:last-child {
+    border-bottom: none;
+}
+.status-icon {
+    font-size: 1.5rem;
+    width: 2rem;
+    text-align: center;
+}
+.status-icon.ok { color: #4caf50; }
+.status-icon.error { color: #f44336; }
+.status-icon.checking { color: #2196f3; animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.status-text {
+    flex: 1;
+}
+.status-text h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+}
+.status-text p {
+    margin: 0;
+    color: var(--ink-2, #666);
+    font-size: 0.875rem;
+}
+.instructions {
+    background: var(--surface-1, #f5f5f5);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.instructions h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.125rem;
+}
+.instructions ol {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+.instructions li {
+    margin-bottom: 0.75rem;
+}
+.btn {
+    display: inline-block;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+.btn:hover {
+    background: #1557b0;
+}
+
+.skip-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--ink-2, #666);
+}
+.skip-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+.status-description {
+    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--ink-3, #888);
+    line-height: 1.4;
+}
+.success-banner {
+    background: #e8f5e9;
+    border: 1px solid #4caf50;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #2e7d32;
+}
+.success-banner .icon {
+    font-size: 1.5rem;
+}
+.hidden { display: none !important; }
+</style>
+</head>
+
+<body>
+<div class="header">
+    <img src="img/ublock.svg" alt="uBlock Origin">
+    <h1>uBlock Origin - Setup Required</h1>
+</div>
+<div id="success-banner" class="success-banner hidden">
+    <span class="icon">✓</span>
+    <span>All set! uBlock Origin is fully configured. You can close this page now.</span>
+</div>
+
+<div>
+    <div class="status-card">
+        <div class="status-item" id="userscripts-status">
+            <span class="status-icon checking">⟳</span>
+            <div class="status-text">
+                <h3>Allow User Scripts</h3>
+                <p>Required for full ad blocking functionality</p>
+                <p class="status-description">Certain blocking rules require executing JavaScript on page, such as bypassing anti-adblock, hiding cookie banners, etc.</p>
+            </div>
+        </div>
+        <div class="status-item" id="incognito-status">
+            <span class="status-icon checking">⟳</span>
+            <div class="status-text">
+                <h3>Allow in Incognito <span style="font-weight: normal; font-size: 0.75rem; color: var(--ink-2, #666);">(Optional)</span></h3>
+                <p>Enables ad blocking in private browsing windows</p>
+                <p class="status-description">Without this, ads will not be blocked in incognito/private windows.</p>
+                <label class="skip-option">
+                    <input type="checkbox" id="skip-incognito">
+                    <span>Don't remind me (you can enable this later in extension settings)</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h2>How to enable these settings:</h2>
+        <ol>
+            <li>Click the button below to open extension settings</li>
+            <li>Find <strong>"Allow User Scripts"</strong> toggle and enable it (required)</li>
+            <li>
+                If blocking rules are not working: Enable <strong>"Developer mode"</strong>.
+                <div style="margin-top: 0.25rem; font-size: 0.85em; color: var(--ink-2, #666);">
+                    Look for the toggle switch in the top right corner of the Extensions page.
+                </div>
+                <div style="margin-top: 0.5rem; font-size: 0.85em; color: var(--ink-2, #666);">
+                    <details>
+                        <summary style="cursor: pointer; user-select: none;">Why do I need to do this?</summary>
+                        <p style="margin: 0.5rem 0 0 0; line-height: 1.4;">
+                            Chrome officially requires Developer Mode for user scripts to work <a href="https://developer.chrome.com/docs/extensions/reference/api/userScripts#chrome_versions_prior_to_138_developer_mode_toggle" target="_blank">prior to version 138</a>. However, this requirement is not fully lifted immediately after version 138 as Google was still <a href="https://issues.chromium.org/issues/390138269" target="_blank">working on it</a>.
+                        </p>
+                    </details>
+                </div>
+            </li>
+            <li>Optionally, find <strong>"Allow in Incognito"</strong> toggle and enable it</li>
+        </ol>
+    </div>
+
+    <div>
+        <button id="open-settings" class="btn">Open Extension Settings</button>
+    </div>
+</div>
+
+<script src="js/setup.js" type="module"></script>
+
+</body>
+</html>
