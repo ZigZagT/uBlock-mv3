@@ -1,4 +1,5 @@
 import "/js/patches.js";
+import "/js/setup-check.js";
 import "/js/worker.mv3.js";
 import "/js/xhr.mv3.js";
 import "/lib/lz4/lz4-block-codec-js.js";
