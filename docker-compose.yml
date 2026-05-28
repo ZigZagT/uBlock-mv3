@@ -7,3 +7,4 @@ services:
     working_dir: /build
     environment:
       - UPDATE_URL=${UPDATE_URL}
+      - UPDATE_MANIFEST_URL=${UPDATE_MANIFEST_URL}
