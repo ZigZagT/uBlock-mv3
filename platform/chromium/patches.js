@@ -89,13 +89,20 @@ function checkUserScripts() {
 	}
 }
 
-globalThis.__ubo_preinit = async () => {
-	while (!checkUserScripts()) {
-        chrome.browserAction.setBadgeText({ text: "!" });
-        chrome.browserAction.setBadgeBackgroundColor({
-            color: "#FC0",
-        });
-		await new Promise(r=>setTimeout(r, 1000 * 60 * 5));
+// State + badge are managed in a single place. Re-runnable; idempotent.
+// Called at SW startup, on popup open (via messaging.js), and when the
+// setup page tells us userScripts was just enabled (via setup-check.js).
+globalThis.__ubo_hasUserScripts = undefined;
+globalThis.__ubo_refreshUserScriptsState = () => {
+	const now = checkUserScripts();
+	if (now === globalThis.__ubo_hasUserScripts) return now;
+	globalThis.__ubo_hasUserScripts = now;
+	if (now) {
+		chrome.browserAction.setBadgeText({ text: "" });
+	} else {
+		chrome.browserAction.setBadgeText({ text: "!" });
+		chrome.browserAction.setBadgeBackgroundColor({ color: "#FC0" });
 	}
-	globalThis.__ubo_hasUserScripts = true;
-}
+	return now;
+};
+globalThis.__ubo_refreshUserScriptsState();

@@ -44,5 +44,10 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	if (message.action === 'openExtensionSettings') {
 		chrome.tabs.create({ url: 'chrome://extensions/?id=' + chrome.runtime.id });
+	} else if (message.action === 'userScriptsTurnedOn') {
+		// Setup page detected userScripts is now enabled; re-check and
+		// update the cached flag / badge so popup and UI reflect the new
+		// state immediately, without waiting for SW restart.
+		globalThis.__ubo_refreshUserScriptsState?.();
 	}
 });

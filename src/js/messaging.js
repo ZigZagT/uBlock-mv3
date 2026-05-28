@@ -376,7 +376,9 @@ const popupDataFromTabId = function(tabId, tabTitle) {
         tabTitle,
         tooltipsDisabled: µbus.tooltipsDisabled,
         hasUnprocessedRequest: vAPI.net && vAPI.net.hasUnprocessedRequest(tabId),
-		hasUserScripts: globalThis.__ubo_hasUserScripts,
+        hasUserScripts: globalThis.__ubo_refreshUserScriptsState
+            ? globalThis.__ubo_refreshUserScriptsState()
+            : globalThis.__ubo_hasUserScripts,
     };
 
     if ( µbhs.uiPopupConfig !== 'unset' ) {

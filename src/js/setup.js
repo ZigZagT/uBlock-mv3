@@ -73,6 +73,13 @@ async function checkStatus() {
     const incognitoOk = await isIncognitoAllowed();
     const userScriptsOk = await isUserScriptsEnabled();
 
+    // Service worker caches userScripts state at startup; tell it to refresh
+    // when we see it has become available so the badge / popup banner update
+    // without waiting for the next SW restart.
+    if (userScriptsOk) {
+        chrome.runtime.sendMessage({ action: 'userScriptsTurnedOn' });
+    }
+
     await updateStatusDisplay(userScriptsOk, incognitoOk);
 
     const successBanner = document.getElementById('success-banner');
