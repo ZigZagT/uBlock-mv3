@@ -317,8 +317,9 @@ vAPI.messaging.send('dashboard', { what: 'getLocalData' }).then(result => {
 });
 
 // https://github.com/uBlockOrigin/uBlock-issues/issues/591
+// Hook the cogs icon by href instead of the removed data-i18n-title attr.
 dom.on(
-    '[data-i18n-title="settingsAdvancedUserSettings"]',
+    'a[href="advanced-settings.html"]',
     'click',
     self.uBlockDashboard.openOrSelectPage
 );

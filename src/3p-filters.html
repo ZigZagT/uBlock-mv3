@@ -31,10 +31,10 @@
         <label><span class="input checkbox"><input type="checkbox" id="suspendUntilListsAreLoaded"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span data-i18n="3pSuspendUntilListsAreLoaded"></span></label>
     </div>
     <div class="li">
-        <label><span class="input checkbox"><input type="checkbox" id="parseCosmeticFilters"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span><span data-i18n="3pParseAllABPHideFiltersPrompt1"></span>&nbsp;<span class="fa-icon info" data-i18n-title="3pParseAllABPHideFiltersInfo">question-circle</span></span></label>
+        <label><span class="input checkbox"><input type="checkbox" id="parseCosmeticFilters"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span><span data-i18n="3pParseAllABPHideFiltersPrompt1"></span>&nbsp;<span class="fa-icon info" title="Parse and apply ABP-style cosmetic hide filters">question-circle<span class="iconCaption">Info</span></span></span></label>
     </div>
     <div class="li">
-        <label><span class="input checkbox"><input type="checkbox" id="ignoreGenericCosmeticFilters"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span><span data-i18n="3pIgnoreGenericCosmeticFilters"></span>&nbsp;<span class="fa-icon info" data-i18n-title="3pIgnoreGenericCosmeticFiltersInfo">question-circle</span></span></label>
+        <label><span class="input checkbox"><input type="checkbox" id="ignoreGenericCosmeticFilters"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span><span data-i18n="3pIgnoreGenericCosmeticFilters"></span>&nbsp;<span class="fa-icon info" title="Skip generic cosmetic filters that aren't tied to a domain">question-circle<span class="iconCaption">Info</span></span></span></label>
     </div>
 </div>
 
@@ -43,14 +43,14 @@
 
 <div id="lists">
     <div class="rootstats expandable" data-key="*">
-        <span class="fa-icon listExpander">angle-up</span><span id="listsOfBlockedHostsPrompt"></span>
+        <span class="fa-icon listExpander" title="Expand/collapse list">angle-up<span class="iconCaption">Expand</span></span><span id="listsOfBlockedHostsPrompt"></span>
     </div>
-    <div class="searchfield"><input type="search" spellcheck="false" placeholder="" /><span class="fa-icon">search</span></div>
+    <div class="searchfield"><input type="search" spellcheck="false" placeholder="" /><span class="fa-icon" title="Search">search<span class="iconCaption">Search</span></span></div>
     <div class="listEntries"></div>
     <div class="li listEntry expandable" data-role="import">
         <span class="detailbar">
-            <label><span class="fa-icon listExpander">angle-up</span><span class="listname" data-i18n="3pImport"></span></label>
-            <a class="fa-icon info towiki" href="https://github.com/gorhill/uBlock/wiki/Filter-lists-from-around-the-web" target="_blank">info-circle</a>
+            <label><span class="fa-icon listExpander" title="Expand/collapse list">angle-up<span class="iconCaption">Expand</span></span><span class="listname" data-i18n="3pImport"></span></label>
+            <a class="fa-icon info towiki" href="https://github.com/gorhill/uBlock/wiki/Filter-lists-from-around-the-web" target="_blank" title="Filter lists docs">info-circle<span class="iconCaption">Docs</span></a>
         </span>
         <textarea dir="ltr" spellcheck="false" placeholder="3pExternalListsHint"></textarea>
     </div>
@@ -65,15 +65,15 @@
             <label><span class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span><span class="listname forinput"></span>
             </span></label>
             <span class="iconbar"><!--
-             --><a class="fa-icon content" href="#" type="text/plain" target="_blank" data-i18n-title="3pViewContent">eye-open</a><!--
-             --><a class="fa-icon support" href="#" target="_blank">home</a><!--
-             --><span class="fa-icon remove">trash-o</span><!--
-             --><a class="fa-icon mustread" href="#" target="_blank">info-circle</a><!--
-             --><span class="fa-icon status unsecure" title="http">unlock-alt</span><!--
-             --><span class="fa-icon status obsolete" data-i18n-title="3pExternalListObsolete">exclamation-triangle</span><!--
-             --><span class="fa-icon status cache">clock-o</span><!--
-             --><span class="fa-icon status updating" data-i18n-title="3pUpdating">spinner</span><!--
-             --><span class="fa-icon status failed" data-i18n-title="3pNetworkError">unlink</span>
+             --><a class="fa-icon content" href="#" type="text/plain" target="_blank" title="View list content">eye-open<span class="iconCaption">View</span></a><!--
+             --><a class="fa-icon support" href="#" target="_blank" title="Filter list home">home<span class="iconCaption">Home</span></a><!--
+             --><span class="fa-icon remove" title="Remove filter list">trash-o<span class="iconCaption">Remove</span></span><!--
+             --><a class="fa-icon mustread" href="#" target="_blank" title="Important notice">info-circle<span class="iconCaption">Note</span></a><!--
+             --><span class="fa-icon status unsecure" title="Insecure (http) source">unlock-alt<span class="iconCaption">http</span></span><!--
+             --><span class="fa-icon status obsolete" title="List is out of date">exclamation-triangle<span class="iconCaption">Stale</span></span><!--
+             --><span class="fa-icon status cache" title="Last fetched">clock-o<span class="iconCaption">Cached</span></span><!--
+             --><span class="fa-icon status updating" title="Updating now">spinner<span class="iconCaption">Updating</span></span><!--
+             --><span class="fa-icon status failed" title="Network error">unlink<span class="iconCaption">Failed</span></span>
             </span>
             <span class="leafstats"></span>
         </span>
@@ -82,21 +82,21 @@
         <span class="detailbar">
             <label><span class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span class="listname forinput"></span></label>
             <span class="nodestats"></span>
-            <span class="fa-icon listExpander">angle-up</span>
+            <span class="fa-icon listExpander" title="Expand/collapse list">angle-up<span class="iconCaption">Expand</span></span>
             <span class="iconbar"><!--
-             --><a class="fa-icon support" href="#" target="_blank">home</a><!--
-             --><a class="fa-icon mustread" href="#" target="_blank">info-circle</a><!--
-             --><span class="fa-icon status obsolete" data-i18n-title="3pExternalListObsolete">exclamation-triangle</span><!--
-             --><span class="fa-icon status cache">clock-o</span><!--
-             --><span class="fa-icon status updating" data-i18n-title="3pUpdating">spinner</span><!--
-             --><span class="fa-icon status failed" data-i18n-title="3pNetworkError">unlink</span>
+             --><a class="fa-icon support" href="#" target="_blank" title="Filter list home">home<span class="iconCaption">Home</span></a><!--
+             --><a class="fa-icon mustread" href="#" target="_blank" title="Important notice">info-circle<span class="iconCaption">Note</span></a><!--
+             --><span class="fa-icon status obsolete" title="List is out of date">exclamation-triangle<span class="iconCaption">Stale</span></span><!--
+             --><span class="fa-icon status cache" title="Last fetched">clock-o<span class="iconCaption">Cached</span></span><!--
+             --><span class="fa-icon status updating" title="Updating now">spinner<span class="iconCaption">Updating</span></span><!--
+             --><span class="fa-icon status failed" title="Network error">unlink<span class="iconCaption">Failed</span></span>
             </span>
             <span class="leafstats"></span>
         </span>
     </div>
     <div class="li listEntry expandable" data-parent="root" data-role="node">
         <span class="detailbar">
-            <label><span class="fa-icon listExpander">angle-up</span><span class="listname"></span></label>
+            <label><span class="fa-icon listExpander" title="Expand/collapse list">angle-up<span class="iconCaption">Expand</span></span><span class="listname"></span></label>
             <span class="nodestats"></span>
         </span>
     </div>

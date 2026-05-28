@@ -16,7 +16,8 @@
     --popup-gap-extra-thin: calc(0.25 * var(--popup-gap));
     --popup-main-min-width: 18em;
     --popup-firewall-min-width: 30em;
-    --popup-rule-cell-width: 5em;
+    --popup-rule-cell-width: 7em;
+    --popup-counts-cell-width: 5.5em;
     font-size: var(--font-size);
     line-height: 20px;
     }
@@ -397,8 +398,7 @@ body.needUserScripts #userScriptsWarning {
 #firewall.expanded > div.isSubdomain.expandException:not(.isRootContext) {
     display: none;
     }
-#firewall > div > span,
-#actionSelector > #dynaCounts {
+#firewall > div > span {
     background-color: var(--popup-cell-surface);
     border: none;
     box-sizing: border-box;
@@ -411,14 +411,6 @@ body.needUserScripts #userScriptsWarning {
     flex-direction: unset;
     flex-grow: 1;
     }
-#firewall > div:first-of-type span[data-i18n]::before {
-    color: var(--ink-3);
-    content: '+';
-    padding-right: 0.25em;
-    }
-#firewall.expanded > div:first-of-type span[data-i18n]::before {
-    content: '\2012';
-    }
 #firewall > div > span:first-of-type {
     flex-direction: column;
     flex-grow: 1;
@@ -426,7 +418,7 @@ body.needUserScripts #userScriptsWarning {
     padding-right: 2px;
     text-align: right;
     white-space: normal;
-    width: calc(100% - var(--popup-rule-cell-width));
+    width: calc(100% - var(--popup-counts-cell-width) - var(--popup-rule-cell-width));
     word-break: break-word;
     }
 #firewall > div[data-des="*"] > span:first-of-type {
@@ -473,20 +465,42 @@ body.needUserScripts #userScriptsWarning {
 #firewall > div > span:first-of-type > sub:empty {
     display: none;
     }
-#firewall > div > span:first-of-type ~ span {
+/* "ALLOWED/BLOCKED" counts column. Always visible. Content is rendered
+   by JS as <numAllowed>/<numBlocked> so each side is colour-coded. */
+#firewall > div > span.counts {
+    align-items: center;
+    color: var(--ink-2);
     flex-shrink: 0;
+    font-family: monospace;
+    font-size: 0.85em;
+    justify-content: space-between;
     margin-left: 1px;
-    width: var(--popup-rule-cell-width);
+    overflow: hidden;
+    padding-inline: 0.35em;
+    white-space: nowrap;
+    width: var(--popup-counts-cell-width);
     }
-#firewall > div > span:nth-of-type(2) {
-    display: none;
+.numAllowed {
+    color: rgb(0, 127, 0);
+    font-weight: 600;
+    text-align: left;
     }
-#firewall > div > span:nth-of-type(3),
-#firewall > div > span:nth-of-type(4) {
+.numBlocked {
+    color: rgb(192, 0, 0);
+    font-weight: 600;
+    text-align: right;
+    }
+/* Rule cells. Hidden by default; advanced mode reveals them. Use
+   [data-src] attribute selectors throughout (not :nth-of-type) so
+   inserting the counts column doesn't shift positional matches. */
+#firewall > div > span[data-src] {
     color: var(--ink-2);
     display: none;
+    flex-shrink: 0;
     font-family: monospace;
+    margin-left: 1px;
     text-align: center;
+    width: var(--popup-rule-cell-width);
     }
 #firewall > div.isDomain > span:first-of-type > span {
     pointer-events: none;
@@ -499,66 +513,87 @@ body.needUserScripts #userScriptsWarning {
     content: '\2026\A0';
     opacity: 0.6;
     }
-#firewall > div[data-des="*"] > span:nth-of-type(3),
-#firewall > div.isSubdomain > span:nth-of-type(3),
-#firewall > div.isSubdomain.isRootContext > span:nth-of-type(3),
-#firewall.expanded > div:not(.expandException) > span:nth-of-type(3),
-#firewall:not(.expanded) > div.expandException > span:nth-of-type(3),
-#firewall:not(.expanded) > div.isDomain:not(.expandException) > span:nth-of-type(4),
-#firewall.expanded > div.isDomain.expandException > span:nth-of-type(4),
-#actionSelector > #dynaCounts {
+/* Local-scope rule cell visibility: type rows, subdomain rows, and
+   domain rows (so a per-domain rule is reachable whether the firewall
+   is expanded or collapsed). */
+#firewall > div[data-des="*"] > span[data-src="."],
+#firewall > div.isSubdomain > span[data-src="."],
+#firewall.expanded > div:not(.expandException) > span[data-src="."],
+#firewall:not(.expanded) > div.expandException > span[data-src="."],
+#firewall:not(.expanded) > div.isDomain:not(.expandException) > span[data-src="."],
+#firewall.expanded > div.isDomain.expandException > span[data-src="."] {
     display: inline-flex;
+    justify-content: center;
+    }
+#firewall > div > span > .cellAction {
+    box-sizing: border-box;
+    color: inherit;
+    display: inline-block;
+    flex: 1 1 auto;
+    font-family: inherit;
+    font-size: 0.72em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin: auto;
+    overflow: hidden;
+    pointer-events: none;
+    text-align: center;
+    text-overflow: clip;
+    text-transform: uppercase;
+    white-space: nowrap;
+    }
+/* Cell has no rule set → empty centre. */
+#firewall > div > span:not(.allowRule):not(.blockRule):not(.noopRule) > .cellAction {
+    visibility: hidden;
+    }
+/* Reserve 3em on the left for the absolutely-positioned filter funnel
+   so its icon doesn't overlap the "Request type" text. */
+#firewall > div.matrixHeader {
+    align-items: baseline;
+    color: var(--ink-2);
+    display: flex;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    }
+#firewall > div.matrixHeader > .headerLabel {
+    flex: 1 1 auto;
+    padding-left: 3em;
+    text-align: left;
+    }
+#firewall > div.matrixHeader > .headerCounts {
+    align-items: center;
+    display: flex;
+    flex: 0 0 var(--popup-counts-cell-width);
+    font-size: 0.75em;
     justify-content: space-between;
+    letter-spacing: 0.04em;
+    margin-left: 1px;
+    padding-inline: 0.35em;
     }
-#firewall > div > span[data-acount]::before,
-#firewall > div > span[data-bcount]::after,
-#firewall > div > span[data-acount] > #actionSelector > #dynaCounts::before,
-#firewall > div > span[data-acount] > #actionSelector > #dynaCounts::after {
-    content: ' ';
+#firewall > div.matrixHeader > .headerCol {
+    flex: 0 0 var(--popup-rule-cell-width);
+    margin-left: 1px;
+    text-align: center;
     }
-#firewall > div > span[data-acount]::before,
-#firewall > div > span[data-acount] > #actionSelector > #dynaCounts::before {
-    padding-left: 0.1em;
+#firewall > div.matrixHeader > .scopeGlobal {
+    display: none;
     }
-#firewall > div > span[data-acount="1"]::before,
-#firewall > div > span[data-acount="1"] > #actionSelector > #dynaCounts::before {
-    content: '+';
-    }
-#firewall > div > span[data-acount="2"]::before,
-#firewall > div > span[data-acount="2"] > #actionSelector > #dynaCounts::before {
-    content: '++';
-    }
-#firewall > div > span[data-acount="3"]::before,
-#firewall > div > span[data-acount="3"] > #actionSelector > #dynaCounts::before {
-    content: '+++';
-    }
-#firewall > div > span[data-bcount]::after,
-#firewall > div > span[data-bcount] > #actionSelector > #dynaCounts::after {
-    padding-right: 0.1em;
-    }
-#firewall > div > span[data-bcount="1"]::after,
-#firewall > div > span[data-bcount="1"] > #actionSelector > #dynaCounts::after {
-    content: '\2212';
-    }
-#firewall > div > span[data-bcount="2"]::after,
-#firewall > div > span[data-bcount="2"] > #actionSelector > #dynaCounts::after {
-    content: '\2212\2212';
-    }
-#firewall > div > span[data-bcount="3"]::after,
-#firewall > div > span[data-bcount="3"] > #actionSelector > #dynaCounts::after {
-    content: '\2212\2212\2212';
+body.advancedUser #firewall > div.matrixHeader > .scopeGlobal {
+    display: block;
     }
 
 body.advancedUser #firewall > div > span:first-of-type {
-    width: calc(100% - 2 * var(--popup-rule-cell-width));
+    width: calc(100% - var(--popup-counts-cell-width) - 2 * var(--popup-rule-cell-width));
     }
-body.advancedUser #firewall > div > span:nth-of-type(2) {
+body.advancedUser #firewall > div > span[data-src="/"] {
     display: inline-flex;
     }
 body.advancedUser #firewall > div:first-of-type ~ div[data-des="*"] {
     display: flex;
     }
-body.advancedUser #firewall > div > span:first-of-type ~ span {
+body.advancedUser #firewall > div > span[data-src] {
     cursor: pointer;
     }
 
@@ -597,6 +632,17 @@ body.advancedUser #firewall > div > span:first-of-type ~ span {
 #firewall > div.allowed.blocked > span:first-of-type::before,
 #firewall > div.isDomain.totalAllowed.totalBlocked > span:first-of-type::before {
     background: var(--popup-cell-label-mixed-surface);
+    }
+/* "(current page)" tag after the hostname label on the current page's
+   own row so the user can spot it at a glance. */
+#firewall > div.isRootContext > span:first-of-type::after {
+    color: var(--ink-1);
+    content: '(current page)';
+    font-size: 0.7em;
+    font-style: italic;
+    font-weight: 400;
+    margin-left: 0.5em;
+    white-space: nowrap;
     }
 /* Rule cells */
 body.advancedUser #firewall > div > span.allowRule,
@@ -641,8 +687,16 @@ body.advancedUser #firewall > div > span.noopRule.ownRule,
     z-index: 1;
     }
 #actionSelector > span {
-    display: inline-block;
+    align-items: center;
+    color: #fff;
+    display: inline-flex;
     flex-grow: 1;
+    font-size: 0.7em;
+    font-weight: 700;
+    justify-content: center;
+    letter-spacing: 0.04em;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+    text-transform: uppercase;
     }
 #actionSelector > #dynaAllow {
     display: none;
@@ -650,28 +704,10 @@ body.advancedUser #firewall > div > span.noopRule.ownRule,
 body.godMode #actionSelector > #dynaAllow {
     display: inline-block;
     }
-#actionSelector > #dynaNoop {
-    }
-#actionSelector > #dynaBlock {
-    }
-#actionSelector > #dynaCounts {
-    background-color: transparent;
-    height: 100%;
-    left: 0;
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    }
 
-/* configurable UI elements */
-:root:not(.mobile) .toolRibbon .caption,
-:root.mobile body.no-tooltips .toolRibbon .caption,
-:root.mobile body[data-ui~="-captions"] .toolRibbon .caption {
-    display: none;
-    }
-:root.mobile .toolRibbon .caption,
-:root:not(.mobile) body[data-ui~="+captions"] .toolRibbon .caption {
+/* Every CTA in this fork carries its text label; the upstream
+   +captions/-captions data-ui toggles and tooltipsDisabled are ignored. */
+.toolRibbon .caption {
     display: inherit;
     }
 :root:not(.mobile) .toolRibbon .tool,

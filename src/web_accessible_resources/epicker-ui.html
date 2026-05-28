@@ -16,17 +16,19 @@
 
 <body>
 <aside style="right: 2px; bottom: 2px;">
-<div id="windowbar"><div id="minimize"><svg viewBox="0 0 64 64"><path d="M 16,48 H 48" /><rect x="16" y="16" height="32" width="32" /></svg></div><div id="move"></div><div id="quit" data-i18n-title="pickerQuit"><svg viewBox="0 0 64 64"><path d="M16 16L48 48M16 48L48 16" /></svg></div></div>
+<div id="windowbar"><div id="minimize" title="Minimize picker"><svg viewBox="0 0 64 64"><path d="M 16,48 H 48" /><rect x="16" y="16" height="32" width="32" /></svg><span class="iconCaption">Minimize</span></div><div id="move" title="Drag to move"><span class="iconCaption">Drag</span></div><div id="quit" title="Close picker"><svg viewBox="0 0 64 64"><path d="M16 16L48 48M16 48L48 16" /></svg><span class="iconCaption">Close</span></div></div>
 <section>
     <div>
         <div class="codeMirrorContainer codeMirrorBreakAll cm-theme-override"></div>
         <div class="resultsetWidgets">
             <span id="resultsetModifiers">
-                <span id="resultsetDepth" class="resultsetModifier">
+                <span id="resultsetDepth" class="resultsetModifier" title="Selector depth">
+                    <label class="resultsetModifierLabel">Depth</label>
                     <span><span></span><span></span><span></span></span>
                     <input type="range" min="0" max="7" value="7">
                 </span>
-                <span id="resultsetSpecificity" class="resultsetModifier">
+                <span id="resultsetSpecificity" class="resultsetModifier" title="Selector specificity">
+                    <label class="resultsetModifierLabel">Specificity</label>
                     <span><span></span><span></span><span></span></span>
                     <input type="range" min="0" max="7" value="6">
                 </span>
