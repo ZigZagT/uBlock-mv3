@@ -1,0 +1,123 @@
+name: Build, sign, and release CRX
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Pages deploy + Release creation need contents:write + pages:write.
+# id-token is required by actions/deploy-pages.
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Serialize releases so two pushes don't race on the Pages deployment.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.vars.outputs.version }}
+      ext_id: ${{ steps.vars.outputs.ext_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore signing key from secret
+        env:
+          CRX3_PRIVATE_KEY: ${{ secrets.CRX3_PRIVATE_KEY }}
+        run: |
+          printf '%s' "$CRX3_PRIVATE_KEY" > crx-signing-key.pem
+          chmod 600 crx-signing-key.pem
+
+      # Fork version: keep upstream's first three components (so we
+      # track upstream when it bumps major/minor/rev), and replace
+      # the 4th component with the GitHub Actions run number. Run
+      # number is monotonic across the repo's lifetime, well below
+      # the per-component cap of 65535.
+      - name: Derive fork version + extension id + update URL
+        id: vars
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          UPSTREAM_VERSION=$(cat dist/version)
+          FORK_4TH=${RUN_NUMBER}
+          FORK_VERSION="$(echo "$UPSTREAM_VERSION" | cut -d. -f1-3).${FORK_4TH}"
+          echo "$FORK_VERSION" > dist/version
+          EXT_ID=$(openssl rsa -in crx-signing-key.pem -pubout -outform DER 2>/dev/null \
+            | openssl dgst -sha256 -binary \
+            | head -c 16 \
+            | xxd -p \
+            | tr '0-9a-f' 'a-p')
+          UPDATE_URL="https://github.com/${OWNER}/${REPO}/releases/download/v${FORK_VERSION}"
+          UPDATE_MANIFEST_URL="https://${OWNER}.github.io/${REPO}/uBlock-Origin-MV3-${EXT_ID}.xml"
+          echo "version=${FORK_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "ext_id=${EXT_ID}" >> "$GITHUB_OUTPUT"
+          echo "update_url=${UPDATE_URL}" >> "$GITHUB_OUTPUT"
+          echo "update_manifest_url=${UPDATE_MANIFEST_URL}" >> "$GITHUB_OUTPUT"
+          echo "Fork version:        ${FORK_VERSION}"
+          echo "Extension ID:        ${EXT_ID}"
+          echo "CRX URL base:        ${UPDATE_URL}"
+          echo "Update manifest URL: ${UPDATE_MANIFEST_URL}"
+
+      # Builds and signs inside the project's docker image (matches
+      # local make targets). Output files land under dist/build/.
+      # - UPDATE_URL: directory where the CRX is published, used by
+      #   crx3 to fill the codebase= attribute in the generated XML.
+      # - UPDATE_MANIFEST_URL: where the XML itself lives, baked into
+      #   the extension's manifest.json so manual installs also
+      #   auto-update from our Pages site.
+      - name: Build, sign, package CRX
+        env:
+          UPDATE_URL: ${{ steps.vars.outputs.update_url }}
+          UPDATE_MANIFEST_URL: ${{ steps.vars.outputs.update_manifest_url }}
+        run: |
+          docker compose build builder
+          docker compose run --rm builder make init package-crx
+
+      - name: Stage update.xml + landing page for Pages
+        env:
+          EXT_ID: ${{ steps.vars.outputs.ext_id }}
+          VERSION: ${{ steps.vars.outputs.version }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          mkdir -p _site
+          cp "dist/build/uBlock-Origin-MV3-${EXT_ID}.xml" "_site/"
+          sed \
+            -e "s|__EXT_ID__|${EXT_ID}|g" \
+            -e "s|__VERSION__|${VERSION}|g" \
+            -e "s|__OWNER__|${OWNER}|g" \
+            -e "s|__REPO__|${REPO}|g" \
+            .github/pages/index.html > _site/index.html
+
+      # Pages artifact uploads happen before the Release is created
+      # below, but the actual Pages deploy (deploy-pages job) runs
+      # AFTER this build job completes -- so by the time the XML goes
+      # live the Release with the .crx already exists.
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Create GitHub Release with CRX
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.vars.outputs.version }}
+          files: dist/build/uBlock-Origin-MV3-*.crx
+          fail_on_unmatched_files: true
+
+  deploy-pages:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
