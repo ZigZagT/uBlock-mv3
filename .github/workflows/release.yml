@@ -1,0 +1,117 @@
+name: Build, sign, and release CRX
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Pages deploy + Release creation need contents:write + pages:write.
+# id-token is required by actions/deploy-pages.
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Serialize releases so two pushes don't race on the Pages deployment.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.vars.outputs.version }}
+      ext_id: ${{ steps.vars.outputs.ext_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore signing key from secret
+        env:
+          CRX3_PRIVATE_KEY: ${{ secrets.CRX3_PRIVATE_KEY }}
+        run: |
+          printf '%s' "$CRX3_PRIVATE_KEY" > crx-signing-key.pem
+          chmod 600 crx-signing-key.pem
+
+      # Fork version: keep upstream's first three components (so we
+      # track upstream when it bumps major/minor/rev), and set the
+      # 4th component to upstream_4th * 1000 + run_number. Each
+      # upstream 4th-component bump opens a fresh thousand-slot range
+      # for our fork patches, guaranteeing the fork stays above
+      # upstream's current 4th while run_number provides monotonic
+      # increase across our own builds.
+      - name: Derive fork version + extension id + update URL
+        id: vars
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          UPSTREAM_VERSION=$(cat dist/version)
+          UPSTREAM_4TH=$(echo "$UPSTREAM_VERSION" | cut -d. -f4)
+          FORK_4TH=$((UPSTREAM_4TH * 1000 + RUN_NUMBER))
+          FORK_VERSION="$(echo "$UPSTREAM_VERSION" | cut -d. -f1-3).${FORK_4TH}"
+          echo "$FORK_VERSION" > dist/version
+          EXT_ID=$(openssl rsa -in crx-signing-key.pem -pubout -outform DER 2>/dev/null \
+            | openssl dgst -sha256 -binary \
+            | head -c 16 \
+            | xxd -p \
+            | tr '0-9a-f' 'a-p')
+          UPDATE_URL="https://github.com/${OWNER}/${REPO}/releases/download/v${FORK_VERSION}"
+          echo "version=${FORK_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "ext_id=${EXT_ID}" >> "$GITHUB_OUTPUT"
+          echo "update_url=${UPDATE_URL}" >> "$GITHUB_OUTPUT"
+          echo "Fork version: ${FORK_VERSION}"
+          echo "Extension ID: ${EXT_ID}"
+          echo "CRX URL base:  ${UPDATE_URL}"
+
+      # Builds and signs inside the project's docker image (matches
+      # local make targets). Output files land under dist/build/.
+      - name: Build, sign, package CRX
+        env:
+          UPDATE_URL: ${{ steps.vars.outputs.update_url }}
+        run: |
+          docker compose build builder
+          docker compose run --rm builder make init package-crx
+
+      - name: Stage update.xml + landing page for Pages
+        env:
+          EXT_ID: ${{ steps.vars.outputs.ext_id }}
+          VERSION: ${{ steps.vars.outputs.version }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          mkdir -p _site
+          cp "dist/build/uBlock-Origin-MV3-${EXT_ID}.xml" "_site/"
+          sed \
+            -e "s|__EXT_ID__|${EXT_ID}|g" \
+            -e "s|__VERSION__|${VERSION}|g" \
+            -e "s|__OWNER__|${OWNER}|g" \
+            -e "s|__REPO__|${REPO}|g" \
+            .github/pages/index.html > _site/index.html
+
+      # Pages artifact uploads happen before the Release is created
+      # below, but the actual Pages deploy (deploy-pages job) runs
+      # AFTER this build job completes -- so by the time the XML goes
+      # live the Release with the .crx already exists.
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Create GitHub Release with CRX
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.vars.outputs.version }}
+          files: dist/build/uBlock-Origin-MV3-*.crx
+          fail_on_unmatched_files: true
+
+  deploy-pages:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
