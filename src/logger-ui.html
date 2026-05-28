@@ -22,15 +22,15 @@
             <option value="-1" data-i18n="logBehindTheScene">
             <option value="_" data-i18n="loggerCurrentTab">
         </select>&ensp;
-        <button id="refresh" class="iconified notext disabled needdom" data-i18n-title="loggerReloadTip" type="button"><span class="fa-icon">refresh</span><span class="hover"></span></button>
-        <button id="showdom" class="iconified notext disabled needdom" data-i18n-title="loggerDomInspectorTip" type="button"><span class="fa-icon">code</span><span class="hover"></span></button>
-        <button id="showpopup" class="iconified notext disabled needdom" data-i18n-title="loggerPopupPanelTip" type="button"><span class="fa-icon"><svg><use href="/img/ublock-defs.svg#ubo-solid"></use></svg></span><span class="hover"></span></button>
+        <button id="refresh" class="iconified notext disabled needdom" data-i18n-title="loggerReloadTip" type="button"><span class="fa-icon">refresh<span class="iconCaption">Reload</span></span><span class="hover"></span></button>
+        <button id="showdom" class="iconified notext disabled needdom" data-i18n-title="loggerDomInspectorTip" type="button"><span class="fa-icon">code<span class="iconCaption">DOM</span></span><span class="hover"></span></button>
+        <button id="showpopup" class="iconified notext disabled needdom" data-i18n-title="loggerPopupPanelTip" type="button"><span class="fa-icon"><svg><use href="/img/ublock-defs.svg#ubo-solid"></use></svg><span class="iconCaption">Popup</span></span><span class="hover"></span></button>
     </div>
     <div>
-        <button class="logConsole iconified notext" title="Show/hide console" type="button"><span class="fa-icon">terminal</span><span class="hover"></span></button>
+        <button class="logConsole iconified notext" title="Show/hide console" type="button"><span class="fa-icon">terminal<span class="iconCaption">Console</span></span><span class="hover"></span></button>
     </div>
     <div>
-        <a class="wikilink fa-icon" href="https://github.com/gorhill/uBlock/wiki/The-logger" target="_blank" data-i18n-title="loggerInfoTip">book</a>
+        <a class="wikilink fa-icon" href="https://github.com/gorhill/uBlock/wiki/The-logger" target="_blank" title="Logger documentation">book<span class="iconCaption">Docs</span></a>
     </div>
 </div>
 
@@ -38,11 +38,11 @@
     <div id="domInspector" class="inspector hCompact">
         <div class="permatoolbar">
             <div>
-                <button class="iconified notext vExpandToggler"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
-                <button class="iconified notext vCompactToggler"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
-                <button class="iconified notext hCompactToggler"><span class="fa-icon">double-angle-left</span><span class="hover"></span></button>
-                <button class="iconified notext revert disabled"><span class="fa-icon">eraser</span><span class="hover"></span></button>
-                <button class="iconified notext commit disabled"><span class="fa-icon">floppy-o</span><span class="hover"></span></button>
+                <button class="iconified notext vExpandToggler" title="Expand vertically"><span class="fa-icon">double-angle-up<span class="iconCaption">Expand</span></span><span class="hover"></span></button>
+                <button class="iconified notext vCompactToggler" title="Compact vertically"><span class="fa-icon">double-angle-up<span class="iconCaption">Compact</span></span><span class="hover"></span></button>
+                <button class="iconified notext hCompactToggler" title="Compact horizontally"><span class="fa-icon">double-angle-left<span class="iconCaption">Narrow</span></span><span class="hover"></span></button>
+                <button class="iconified notext revert disabled" title="Revert DOM changes"><span class="fa-icon">eraser<span class="iconCaption">Revert</span></span><span class="hover"></span></button>
+                <button class="iconified notext commit disabled" title="Save DOM changes"><span class="fa-icon">floppy-o<span class="iconCaption">Save</span></span><span class="hover"></span></button>
             </div>
         </div>
         <div class="vscrollable">
@@ -52,12 +52,12 @@
     <div id="netInspector" class="inspector f">
         <div class="permatoolbar">
             <div>
-                <button class="iconified notext vCompactToggler"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
-                <button id="clean" class="iconified notext disabled"><span class="fa-icon">times</span><span class="hover"></span></button>
-                <button id="clear" class="iconified notext disabled" data-i18n-title="loggerClearTip"><span class="fa-icon">eraser</span><span class="hover"></span></button>
-                <button id="pause" class="iconified notext"><span class="fa-icon" data-i18n-title="loggerPauseTip">pause-circle-o</span><span class="fa-icon" data-i18n-title="loggerUnpauseTip">play-circle-o</span><span class="hover"></span></button>&ensp;
+                <button class="iconified notext vCompactToggler" title="Toggle compact view"><span class="fa-icon">double-angle-up<span class="iconCaption">Compact</span></span><span class="hover"></span></button>
+                <button id="clean" class="iconified notext disabled" title="Clear visible entries"><span class="fa-icon">times<span class="iconCaption">Clear shown</span></span><span class="hover"></span></button>
+                <button id="clear" class="iconified notext disabled" title="Clear all entries"><span class="fa-icon">eraser<span class="iconCaption">Clear all</span></span><span class="hover"></span></button>
+                <button id="pause" class="iconified notext" title="Pause / resume logging"><span class="fa-icon pauseState">pause-circle-o<span class="iconCaption">Pause</span></span><span class="fa-icon resumeState">play-circle-o<span class="iconCaption">Resume</span></span><span class="hover"></span></button>&ensp;
                 <span id="filterExprGroup">
-                    <button id="filterButton" class="iconified notext" data-i18n-title="loggerRowFiltererButtonTip"><span class="fa-icon">filter</span><span class="hover"></span></button>
+                    <button id="filterButton" class="iconified notext" title="Show / hide filter expression picker"><span class="fa-icon">filter<span class="iconCaption">Filter</span></span><span class="hover"></span></button>
                     <span id="filterInput">
                         <input type="search" placeholder="logFilterPrompt" spellcheck="false">
                         <span id="filterExprButton" class="button fa-icon expanded" data-i18n-title="loggerRowFiltererBuiltinTip">angle-up</span>
@@ -87,9 +87,9 @@
                 </span>
             </div>
             <div>
-                <button id="loggerStats" class="iconified notext" style="display: none;"><span class="fa-icon">bar-chart</span><span class="hover"></span></button>
-                <button id="loggerExport" class="iconified notext"><span class="fa-icon">clipboard</span><span class="hover"></span></button>
-                <button id="loggerSettings" class="iconified notext"><span class="fa-icon">cog</span><span class="hover"></span></button>
+                <button id="loggerStats" class="iconified notext" style="display: none;" title="Show stats"><span class="fa-icon">bar-chart<span class="iconCaption">Stats</span></span><span class="hover"></span></button>
+                <button id="loggerExport" class="iconified notext" title="Export log"><span class="fa-icon">clipboard<span class="iconCaption">Export</span></span><span class="hover"></span></button>
+                <button id="loggerSettings" class="iconified notext" title="Logger settings"><span class="fa-icon">cog<span class="iconCaption">Settings</span></span><span class="hover"></span></button>
             </div>
         </div>
         <div class="vscrollable">
@@ -109,7 +109,7 @@
     <div id="infoInspector" class="inspector">
         <div class="permatoolbar">
             <div>
-                <button id="clearConsole" class="iconified notext"><span class="fa-icon">eraser</span><span class="hover"></span></button>
+                <button id="clearConsole" class="iconified notext" title="Clear console"><span class="fa-icon">eraser<span class="iconCaption">Clear</span></span><span class="hover"></span></button>
                 <button id="logLevel" class="iconified notext" title="Toggle verbose mode" type="button"><span class="fa-icon">volume-up</span><span class="hover"></span></button>&ensp;
                 <input type="search" placeholder="Filter output" spellcheck="false">
             </div>
@@ -122,7 +122,7 @@
 
 <div id="modalOverlay">
     <div>
-        <div class="closeButton"><svg viewBox="0 0 64 64"><path d="M 16 16 L 48 48 M 16 48 L 48 16" /></svg></div>
+        <div class="closeButton" title="Close"><svg viewBox="0 0 64 64"><path d="M 16 16 L 48 48 M 16 48 L 48 16" /></svg></div>
         <div id="modalOverlayContainer"></div>
     </div>
 </div>
@@ -138,8 +138,8 @@
                 <span class="header dynamic" data-pane="dynamic" data-i18n="loggerURLFilteringHeader"></span>
                 <span class="header static" data-pane="static" data-i18n="loggerStaticFilteringHeader"></span>
             </span>
-            <span class="tools"><span class="fa-icon picker">eye-dropper</span><span class="fa-icon reload">refresh</span></span>
-            <span class="closeButton"><svg viewBox="0 0 64 64"><path d="M 16 16 L 48 48 M 16 48 L 48 16" /></span>
+            <span class="tools"><span class="fa-icon picker" title="Element picker">eye-dropper</span><span class="fa-icon reload" title="Reload page">refresh</span></span>
+            <span class="closeButton" title="Close"><svg viewBox="0 0 64 64"><path d="M 16 16 L 48 48 M 16 48 L 48 16" /></svg></span>
         </div>
         <div class="panes">
             <div class="pane details" data-pane="details">
@@ -156,13 +156,13 @@
             </div>
             <div class="pane dynamic" data-pane="dynamic">
                 <div class="toolbar row">
-                    <span><span id="saveRules" class="fa-icon">lock</span></span>
+                    <span><span id="saveRules" class="fa-icon" title="Save permanent rules">lock</span></span>
                     <span>
                         <label><span data-i18n="loggerURLFilteringContextLabel"></span> <select class="dynamic origin"></select></label>&emsp;
                         <label><span data-i18n="loggerURLFilteringTypeLabel"></span> <select class="dynamic type"><option><option value="*">*</select></label>
                     </span>
                     <div class="entry row">
-                        <span class="action"><span class="allow">&nbsp;</span><span class="noop">&nbsp;</span><span class="block">&nbsp;</span></span>
+                        <span class="action"><span class="allow">Allow</span><span class="noop">No rule</span><span class="block">Block</span></span>
                         <span class="url"></span>
                     </div>
                 </div>
@@ -183,7 +183,7 @@
     <div id="filterFinderListEntry">
         <span class="listEntry"><!--
          --><a href="asset-viewer.html?url=" target="_blank"></a>&nbsp;<!--
-         --><a href="#" class="fa-icon" target="_blank">home</a><!--
+         --><a href="#" class="fa-icon" target="_blank" title="Filter list home">home</a><!--
      --></span>
     </div>
 

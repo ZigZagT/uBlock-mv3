@@ -231,4 +231,15 @@ endif
 	echo "XML: $${XML_FILE}"
 
 docker-package-crx:
+	@CUR=$$(cat dist/version); \
+	BASE=$$(echo "$$CUR" | cut -d. -f1-3); \
+	PATCH=$$(echo "$$CUR" | cut -d. -f4); \
+	PATCH=$${PATCH:-0}; \
+	NEW="$${BASE}.$$(($$PATCH + 1))"; \
+	echo "$$NEW" > dist/version; \
+	echo "Local build version: $$CUR -> $$NEW"
 	docker compose run --rm builder make init package-crx
+
+install-local:
+	EXT_ID=$$(openssl rsa -in $(KEY_FILE) -pubout -outform DER 2>/dev/null | openssl dgst -sha256 -binary | head -c 16 | xxd -p | tr '0-9a-f' 'a-p')&& \
+	scp dist/build/$(EXTENSION_NAME)-$${EXT_ID}* dead.dev:/profiles/harbor/www/statics/root/chrome

@@ -89,13 +89,15 @@ textarea {
     overflow-y: auto;
 }
 
-#domInspector button.vExpandToggler > .fa-icon {
+/* Flip only the SVG glyph, not the iconCaption text below it.
+   Targeting > svg keeps captions upright. */
+#domInspector button.vExpandToggler > .fa-icon > svg {
     transform: scaleY(1)
     }
-.inspector:not(.vExpanded) button.vCompactToggler > .fa-icon {
+.inspector:not(.vExpanded) button.vCompactToggler > .fa-icon > svg {
     transform: scaleY(-1)
     }
-.hCompact button.hCompactToggler > .fa-icon {
+.hCompact button.hCompactToggler > .fa-icon > svg {
     transform: scaleX(-1)
     }
 
@@ -103,13 +105,15 @@ textarea {
     display: none;
     }
 
-#netInspector #pause > .fa-icon[data-i18n-title="loggerUnpauseTip"] {
+/* Toggle pause/resume icons via dedicated class hooks (the previous
+   selector keyed off data-i18n-title which has been removed in this fork). */
+#netInspector #pause > .resumeState {
     display: none;
 }
-#netInspector.paused #pause > .fa-icon[data-i18n-title="loggerPauseTip"] {
+#netInspector.paused #pause > .pauseState {
     display: none;
 }
-#netInspector.paused #pause > .fa-icon[data-i18n-title="loggerUnpauseTip"] {
+#netInspector.paused #pause > .resumeState {
     display: inline-flex;
     fill: #5F9EA0;
 }
@@ -770,7 +774,7 @@ body[dir="rtl"] .netFilteringDialog > .panes > .details > div > span:nth-of-type
     flex-grow: 0;
     flex-shrink: 0;
     text-align: center;
-    width: 4.5em;
+    width: 12em;
     }
 body[dir="ltr"] .netFilteringDialog > div.panes > .dynamic .row > span:nth-of-type(1) {
     border-right: 1px solid var(--surface-0);
@@ -814,14 +818,41 @@ body.dirty .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules {
     border: 0;
     cursor: pointer;
     }
+/* Action choice labels (Allow / No rule / Block). Default state hides
+   the labels — only the colored action cell shows the current rule.
+   On row hover the three labels appear so the user can pick. The
+   contrast of the labels at hover time was previously near-invisible
+   (opacity 0.2); 0.7 (and 1.0 on label hover) gives a readable label
+   without losing the visual hierarchy of "current rule = full-bg cell". */
 .netFilteringDialog > div.panes > .dynamic .entry > .action > span {
+    align-items: center;
     background-color: transparent;
     border: 0;
-    display: inline-block;
+    box-sizing: border-box;
+    color: #fff;
+    display: inline-flex;
+    font-size: 0.7em;
+    font-weight: 700;
     height: 100%;
-    opacity: 0.2;
+    justify-content: center;
+    letter-spacing: 0.02em;
+    opacity: 0.85;
+    overflow: hidden;
+    padding: 0 0.2em;
+    text-overflow: ellipsis;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.65);
+    text-transform: uppercase;
     visibility: hidden;
+    white-space: nowrap;
     width: 33.33%;
+    }
+/* Show the active rule's label inside the .own action cell — the user
+   shouldn't need to hover to know which rule is in effect. */
+.netFilteringDialog > div.panes > .dynamic .entry > .action.own.allow > .allow,
+.netFilteringDialog > div.panes > .dynamic .entry > .action.own.noop > .noop,
+.netFilteringDialog > div.panes > .dynamic .entry > .action.own.block > .block {
+    opacity: 1;
+    visibility: visible;
     }
 .netFilteringDialog > div.panes > .dynamic .entry > .action.allow {
     background-color: rgba(0, 160, 0, 0.3);
@@ -858,11 +889,11 @@ body.dirty .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules {
     background-color: rgba(0, 19, 110, 1);
     }
 .netFilteringDialog > div.panes > .dynamic .entry > .action:not(.own):hover > span {
-    opacity: 0.2;
+    opacity: 0.7;
     visibility: visible;
     }
 .netFilteringDialog > div.panes > .dynamic .entry > .action:not(.own):hover > span:hover {
-    opacity: 0.75;
+    opacity: 1;
     }
 .netFilteringDialog > div.panes > .dynamic .entry > .action > .allow {
     background-color: rgb(0, 160, 0);

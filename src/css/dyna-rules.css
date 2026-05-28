@@ -48,7 +48,7 @@ body {
     padding: 0 0.5em;
     font-size: 150%;
     }
-#ruleFilter #diffCollapse.active {
+#ruleFilter #diffCollapse.active > svg {
     transform: scale(1, -1);
     }
 

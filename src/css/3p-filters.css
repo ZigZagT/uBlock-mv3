@@ -206,8 +206,12 @@ body:not(.updating,.working) #lists .listEntry.checked.obsolete > .detailbar .ic
     }
 body.updating #lists .listEntry.checked.obsolete > .detailbar .iconbar .updating,
 body.working #lists .listEntry.checked.obsolete:not(.cached) > .detailbar .iconbar .updating {
-    animation: spin 1s steps(8) infinite;
     display: inline-flex;
+    }
+/* Spin only the svg glyph; keep the iconCaption text upright. */
+body.updating #lists .listEntry.checked.obsolete > .detailbar .iconbar .updating > svg,
+body.working #lists .listEntry.checked.obsolete:not(.cached) > .detailbar .iconbar .updating > svg {
+    animation: spin 1s steps(8) infinite;
     }
 
 #lists .listEntry.toRemove .checkbox {

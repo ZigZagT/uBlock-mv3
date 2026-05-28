@@ -199,23 +199,42 @@ const safePunycodeToUnicode = function(hn) {
 
 /******************************************************************************/
 
-const updateFirewallCellCount = function(cells, allowed, blocked) {
-    for ( const cell of cells ) {
-        if ( gtz(allowed) ) {
-            dom.attr(cell, 'data-acount',
-                Math.min(Math.ceil(Math.log(allowed + 1) / Math.LN10), 3)
-            );
-        } else {
-            dom.attr(cell, 'data-acount', '0');
-        }
-        if ( gtz(blocked) ) {
-            dom.attr(cell, 'data-bcount',
-                Math.min(Math.ceil(Math.log(blocked + 1) / Math.LN10), 3)
-            );
-        } else {
-            dom.attr(cell, 'data-bcount', '0');
-        }
+const formatCount = function(n) {
+    if ( n < 1000 ) { return String(n); }
+    if ( n < 10000 ) { return `${Math.floor(n / 100) / 10}k`; }
+    return `${Math.floor(n / 1000)}k`;
+};
+
+// Lazily creates the single .cellAction child on first call (called
+// during the initial build of each rule cell). Subsequent renders find
+// it and no-op — so an actionSelector appended on hover survives a
+// re-render mid-hover.
+const ensureRuleCellAction = function(cell) {
+    if ( qs$(cell, ':scope > .cellAction') !== null ) { return; }
+    const action = document.createElement('span');
+    action.className = 'cellAction';
+    cell.replaceChildren(action);
+};
+
+// Renders "<allow>/<block>" into the row's .counts span, each number
+// in its own colour-coded child span; an empty side keeps its span so
+// the slash stays centered and the other number stays pinned to its
+// edge. Both sides zero → entire span cleared.
+const updateRowCounts = function(row, allowed, blocked) {
+    const span = qs$(row, ':scope > .counts');
+    if ( span === null ) { return; }
+    if ( gtz(allowed) === false && gtz(blocked) === false ) {
+        span.replaceChildren();
+        return;
     }
+    const a = document.createElement('span');
+    a.className = 'numAllowed';
+    a.textContent = gtz(allowed) ? formatCount(allowed) : '';
+    const sep = document.createTextNode('/');
+    const b = document.createElement('span');
+    b.className = 'numBlocked';
+    b.textContent = gtz(blocked) ? formatCount(blocked) : '';
+    span.replaceChildren(a, sep, b);
 };
 
 /******************************************************************************/
@@ -224,20 +243,26 @@ const updateFirewallCellRule = function(cells, scope, des, type, rule) {
     const ruleParts = rule !== undefined ? rule.split(' ') : undefined;
 
     for ( const cell of cells ) {
+        ensureRuleCellAction(cell);
+        const action = qs$(cell, ':scope > .cellAction');
+
         if ( ruleParts === undefined ) {
             dom.attr(cell, 'class', null);
+            action.textContent = '';
             continue;
         }
 
-        const action = updateFirewallCellRule.actionNames[ruleParts[3]];
-        dom.attr(cell, 'class', `${action}Rule`);
+        const actionName = updateFirewallCellRule.actionNames[ruleParts[3]];
+        dom.attr(cell, 'class', `${actionName}Rule`);
+        action.textContent =
+            updateFirewallCellRule.actionLabels[ruleParts[3]] || '';
 
         // Use dark shade visual cue if the rule is specific to the cell.
         if (
             (ruleParts[1] !== '*' || ruleParts[2] === type) &&
             (ruleParts[1] === des) &&
             (ruleParts[0] === scopeToSrcHostnameMap[scope])
-            
+
         ) {
             dom.cl.add(cell, 'ownRule');
         }
@@ -245,6 +270,7 @@ const updateFirewallCellRule = function(cells, scope, des, type, rule) {
 };
 
 updateFirewallCellRule.actionNames = { '1': 'block', '2': 'allow', '3': 'noop' };
+updateFirewallCellRule.actionLabels = { '1': 'block', '2': 'allow', '3': 'no rule' };
 
 /******************************************************************************/
 
@@ -283,14 +309,17 @@ const updateAllFirewallCells = function(doRules = true, doCounts = true) {
         if ( doCounts === false ) { continue; }
         const hnDetails = popupData.hostnameDict[des];
         if ( hnDetails === undefined ) {
-            updateFirewallCellCount(cells);
+            updateRowCounts(row);
             continue;
         }
         const { allowed, blocked } = hnDetails.counts;
-        updateFirewallCellCount([ cells[0] ], allowed.any, blocked.any);
+        // Domain row → totals across its subdomains; subdomain row →
+        // its own per-hostname counts.
         const { totals } = hnDetails;
         if ( totals !== undefined ) {
-            updateFirewallCellCount([ cells[1] ], totals.allowed.any, totals.blocked.any);
+            updateRowCounts(row, totals.allowed.any, totals.blocked.any);
+        } else {
+            updateRowCounts(row, allowed.any, blocked.any);
         }
         if ( hnDetails.domain === pageDomain ) {
             a1pScript += allowed.script; b1pScript += blocked.script;
@@ -302,11 +331,11 @@ const updateAllFirewallCells = function(doRules = true, doCounts = true) {
 
     if ( doCounts ) {
         const fromType = type =>
-            qsa$(`#firewall > [data-des="*"][data-type="${type}"] > [data-src="."]`);
-        updateFirewallCellCount(fromType('1p-script'), a1pScript, b1pScript);
-        updateFirewallCellCount(fromType('3p-script'), a3pScript, b3pScript);
+            qs$(`#firewall > [data-des="*"][data-type="${type}"]`);
+        updateRowCounts(fromType('1p-script'), a1pScript, b1pScript);
+        updateRowCounts(fromType('3p-script'), a3pScript, b3pScript);
         dom.cl.toggle(rowContainer, 'has3pScript', a3pScript !== 0 || b3pScript !== 0);
-        updateFirewallCellCount(fromType('3p-frame'), a3pFrame, b3pFrame);
+        updateRowCounts(fromType('3p-frame'), a3pFrame, b3pFrame);
         dom.cl.toggle(rowContainer, 'has3pFrame', a3pFrame !== 0 || b3pFrame !== 0);
     }
 
@@ -374,12 +403,6 @@ const buildAllFirewallRows = function() {
             ? punycode.toUnicode(des)
             : des;
         const isPunycoded = prettyDomainName !== des;
-
-        if ( isDomain && row.childElementCount < 4 ) {
-            row.append(dom.clone(row.children[2]));
-        } else if ( isDomain === false && row.childElementCount === 4 ) {
-            row.children[3].remove();
-        }
 
         const span = qs$(row, 'span:first-of-type');
         dom.text(qs$(span, ':scope > span > span'), prettyDomainName);
