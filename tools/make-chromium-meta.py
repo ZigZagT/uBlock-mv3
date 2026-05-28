@@ -27,7 +27,7 @@ match = re.search(r'^\d+\.\d+\.\d+\.\d+$', version)
 if match:
     manifest_out['name'] += ' development build'
     manifest_out['short_name'] += ' dev build'
-    manifest_out['browser_action']['default_title'] += ' dev build'
+    manifest_out['action']['default_title'] += ' dev build'
 
 with open(manifest_out_file, 'w') as f:
     json.dump(manifest_out, f, indent=2, separators=(',', ': '), sort_keys=True)

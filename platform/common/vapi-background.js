@@ -37,7 +37,7 @@ vAPI.cantWebsocket =
 
 vAPI.canWASM = vAPI.webextFlavor.soup.has('chromium') === false;
 if ( vAPI.canWASM === false ) {
-    const csp = manifest.content_security_policy;
+    const csp = manifest.content_security_policy.extension_pages;
     vAPI.canWASM = csp !== undefined && csp.indexOf("'wasm-unsafe-eval'") !== -1;
 }
 
@@ -755,7 +755,7 @@ if ( webext.browserAction instanceof Object ) {
 
 {
     const browserAction = vAPI.browserAction;
-    const titleTemplate = `${browser.runtime.getManifest().browser_action.default_title} ({badge})`;
+    const titleTemplate = `${browser.runtime.getManifest().action.default_title} ({badge})`;
     const icons = [
         { path: {
             '16': 'img/icon_16-off.png',
@@ -789,7 +789,8 @@ if ( webext.browserAction instanceof Object ) {
         //
         // Firefox uses an internal cache for each setIcon's paths:
         // https://searchfox.org/mozilla-central/rev/5ff2d7683078c96e4b11b8a13674daded935aa44/browser/components/extensions/parent/ext-browserAction.js#631
-        if ( vAPI.webextFlavor.soup.has('chromium') === false ) { return; }
+        //if ( vAPI.webextFlavor.soup.has('chromium') === false ) { return; }
+        return;
 
         const imgs = [];
         for ( let i = 0; i < icons.length; i++ ) {

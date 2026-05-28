@@ -213,23 +213,16 @@ vAPI.scriptletsInjector = (( ) => {
     const parts = [
         '(',
         function(details) {
-            if ( self.uBO_scriptletsInjected !== undefined ) { return; }
+            if ( self[Symbol.for("uBO_scriptletsInjected")] !== undefined ) { return; }
             const doc = document;
             const { location } = doc;
             if ( location === null ) { return; }
             const { hostname } = location;
             if ( hostname !== '' && details.hostname !== hostname ) { return; }
-            let script;
             try {
-                script = doc.createElement('script');
-                script.appendChild(doc.createTextNode(details.scriptlets));
-                (doc.head || doc.documentElement).appendChild(script);
-                self.uBO_scriptletsInjected = details.filters;
+				const scriptlets = function(){};
+                self[Symbol.for("uBO_scriptletsInjected")] = details.filters;
             } catch {
-            }
-            if ( script ) {
-                script.remove();
-                script.textContent = '';
             }
             return 0;
         }.toString(),
@@ -241,11 +234,19 @@ vAPI.scriptletsInjector = (( ) => {
     return (hostname, details) => {
         parts[jsonSlot] = JSON.stringify({
             hostname,
-            scriptlets: details.mainWorld,
             filters: details.filters,
         });
-        return parts.join('');
+        const code = parts.join('');
+        // Manually substitute noop function with scriptlet wrapper
+        // function, so as to not suffer instances of special
+        // replacement characters `$`,`\` when using String.replace()
+        // with scriptlet code.
+        const match = /function\(\)\{\}/.exec(code);
+        return code.slice(0, match.index) +
+            details.mainWorld +
+            code.slice(match.index + match[0].length) + "\0";
     };
 })();
+
 
 /******************************************************************************/

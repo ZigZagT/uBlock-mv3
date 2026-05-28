@@ -1,9 +1,10 @@
 {
   "author": "Raymond Hill & contributors",
   "background": {
-    "page": "background.html"
+    "service_worker": "js/background.sw.js",
+	"type": "module"
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16": "img/icon_16.png",
       "32": "img/icon_32.png",
@@ -78,7 +79,9 @@
       "all_frames": false
     }
   ],
-  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
   "default_locale": "en",
   "description": "__MSG_extShortDesc__",
   "icons": {
@@ -88,7 +91,7 @@
     "128": "img/icon_128.png"
   },
   "incognito": "split",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "minimum_chrome_version": "93.0",
   "name": "uBlock Origin",
   "options_ui": {
@@ -105,6 +108,11 @@
     "webNavigation",
     "webRequest",
     "webRequestBlocking",
+    "offscreen",
+    "scripting",
+    "userScripts"
+  ],
+  "host_permissions": [
     "<all_urls>"
   ],
   "short_name": "uBlock₀",
@@ -113,6 +121,9 @@
   },
   "version": "1.15.11.0",
   "web_accessible_resources": [
-    "/web_accessible_resources/*"
+    {
+      "resources": ["/web_accessible_resources/*"],
+	  "matches": ["http://*/*", "https://*/*"]
+    }
   ]
 }

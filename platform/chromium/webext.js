@@ -71,10 +71,10 @@ const webext = {
     },
     // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/browserAction
     browserAction: {
-        setBadgeBackgroundColor: promisifyNoFail(chrome.browserAction, 'setBadgeBackgroundColor'),
-        setBadgeText: promisifyNoFail(chrome.browserAction, 'setBadgeText'),
-        setIcon: promisifyNoFail(chrome.browserAction, 'setIcon'),
-        setTitle: promisifyNoFail(chrome.browserAction, 'setTitle'),
+        setBadgeBackgroundColor: promisifyNoFail(chrome.action, 'setBadgeBackgroundColor'),
+        setBadgeText: promisifyNoFail(chrome.action, 'setBadgeText'),
+        setIcon: promisifyNoFail(chrome.action, 'setIcon'),
+        setTitle: promisifyNoFail(chrome.action, 'setTitle'),
     },
     // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/menus
     menus: {
