@@ -795,10 +795,11 @@ let renderOnce = function() {
         dom.attr(dom.body, 'data-ui', popupData.uiPopupConfig);
     }
 
-    dom.cl.toggle(dom.body, 'no-tooltips', popupData.tooltipsDisabled === true);
-    if ( popupData.tooltipsDisabled === true ) {
-        dom.attr('[title]', 'title', null);
-    }
+    // Tooltips are always shown in this fork regardless of the
+    // `tooltipsDisabled` setting -- most controls already lack labels,
+    // hiding what little tooltip coverage exists makes the popup
+    // effectively unusable. The setting still toggles in storage but
+    // has no runtime effect here.
 
     // https://github.com/uBlockOrigin/uBlock-issues/issues/22
     if ( popupData.advancedUserEnabled !== true ) {
